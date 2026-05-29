@@ -8,51 +8,51 @@ Implementación incremental del pipeline de traducción de imágenes en seis fas
 
 ## Tasks
 
-- [ ] 1. Fase 1 – Configuración del entorno y estructura del proyecto
-  - [ ] 1.1 Crear la estructura de directorios y archivos base del proyecto
+- [x] 1. Fase 1 – Configuración del entorno y estructura del proyecto
+  - [x] 1.1 Crear la estructura de directorios y archivos base del proyecto
     - Crear los directorios `src/`, `models/`, `tests/`
     - Crear los archivos vacíos `src/__init__.py`, `tests/__init__.py`, `models/.gitkeep`
     - Crear `app.py`, `src/orchestrator.py`, `src/ocr_module.py`, `src/translation_module.py`, `src/utils.py` con esqueletos mínimos (imports y docstring de módulo)
     - _Requisitos: 8.1, 8.2_
 
-  - [ ] 1.2 Crear `requirements.txt` con todas las dependencias fijadas con `==`
+  - [x] 1.2 Crear `requirements.txt` con todas las dependencias fijadas con `==`
     - Incluir: `easyocr`, `torch`, `torchvision`, `transformers`, `gradio`, `langdetect`, `opencv-python`, `Pillow`, `hypothesis`, `pytest`, `numpy`
     - Fijar versiones compatibles entre sí para Python 3.8+
     - _Requisitos: 7.4, 7.5_
 
-- [ ] 2. Fase 2 – Módulo OCR (`src/ocr_module.py`)
-  - [ ] 2.1 Implementar el dataclass `RegionTexto` en `src/ocr_module.py`
+- [x] 2. Fase 2 – Módulo OCR (`src/ocr_module.py`)
+  - [x] 2.1 Implementar el dataclass `RegionTexto` en `src/ocr_module.py`
     - Definir campos `bbox`, `texto`, `confianza` con sus tipos
     - Implementar las propiedades calculadas `y_min`, `y_max`, `x_min`, `altura`
     - _Requisitos: 2.2, 9.1_
 
-  - [ ] 2.2 Implementar la clase `ModuloOCR` con `__init__` y `detectar_regiones()`
+  - [x] 2.2 Implementar la clase `ModuloOCR` con `__init__` y `detectar_regiones()`
     - Inicializar `easyocr.Reader` con los idiomas configurados y el flag `use_gpu`
     - En `detectar_regiones()`: invocar `reader.readtext()`, filtrar por `confidence_threshold`, retornar lista de `RegionTexto`
     - Propagar excepciones con prefijo `"[OCR] "`
     - _Requisitos: 2.1, 2.2, 2.3, 2.4, 2.6, 2.7_
 
-  - [ ] 2.4 Implementar `consolidar_texto()` en `ModuloOCR`
+  - [x] 2.3 Implementar `consolidar_texto()` en `ModuloOCR`
     - Ordenar regiones por `y_min` ascendente y, dentro de la misma fila, por `x_min` ascendente
     - Insertar `\n` cuando la separación vertical entre regiones supere el 50% de la altura media de la fila
     - Retornar cadena vacía si todas las regiones tienen texto vacío o solo espacios
     - _Requisitos: 3.1, 3.2, 3.3_
 
-- [ ] 3. Checkpoint – Validar Módulo OCR
+- [x] 3. Checkpoint – Validar Módulo OCR
   - Asegurarse de que todos los tests de `tests/test_ocr_module.py` pasan con `pytest tests/test_ocr_module.py`. Consultar al usuario si surgen dudas.
 
-- [ ] 4. Fase 3 – Módulo de Traducción (`src/translation_module.py`)
-  - [ ] 4.1 Implementar la constante `IDIOMAS_SOPORTADOS` y la clase `ModuloTraduccion` con `__init__`
+- [x] 4. Fase 3 – Módulo de Traducción (`src/translation_module.py`)
+  - [x] 4.1 Implementar la constante `IDIOMAS_SOPORTADOS` y la clase `ModuloTraduccion` con `__init__`
     - Definir el diccionario `IDIOMAS_SOPORTADOS` con los 9 idiomas y sus códigos `easyocr`, `iso` y `mbart`
     - Inicializar `_model_cache: dict` vacío y el flag `use_gpu`
     - _Requisitos: 4.2, 7.2_
 
-  - [ ] 4.2 Implementar `_seleccionar_modelo()` y `_cargar_modelo()` en `ModuloTraduccion`
+  - [x] 4.2 Implementar `_seleccionar_modelo()` y `_cargar_modelo()` en `ModuloTraduccion`
     - En `_seleccionar_modelo()`: intentar primero `Helsinki-NLP/opus-mt-{src}-{tgt}`; si no existe, usar `facebook/mbart-large-50-many-to-many-mmt`
     - En `_cargar_modelo()`: cargar el pipeline de Hugging Face, almacenarlo en `_model_cache[(src, tgt)]` y retornarlo
     - _Requisitos: 7.2, 4.5_
 
-  - [ ] 4.3 Implementar `traducir()` en `ModuloTraduccion`
+  - [x] 4.3 Implementar `traducir()` en `ModuloTraduccion`
     - Validar que el texto no esté vacío ni sea solo espacios; lanzar excepción con mensaje exacto si lo está
     - Validar que el texto no supere 50.000 caracteres; lanzar excepción con mensaje exacto si lo supera
     - Si `idioma_origen == idioma_destino`, retornar el texto sin modificar sin cargar modelo

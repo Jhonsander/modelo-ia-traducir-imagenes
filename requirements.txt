@@ -1,0 +1,33 @@
+# Dependencias del Sistema de Traducción Multimodal de Imágenes
+# Versiones fijadas con == para reproducibilidad (Python 3.8+)
+# Requisitos: 7.4, 7.5
+
+# Deep learning
+torch==2.0.1
+torchvision==0.15.2
+
+# OCR
+easyocr==1.7.1
+
+# Traducción (Hugging Face)
+transformers==4.35.2
+sentencepiece==0.1.99
+sacremoses==0.1.1
+huggingface-hub==0.19.4
+
+# Interfaz web
+gradio==3.50.2
+
+# Detección de idioma
+langdetect==1.0.9
+
+# Visión por computador
+opencv-python==4.8.1.78
+Pillow==10.1.0
+
+# Utilidades numéricas
+numpy==1.24.4
+
+# Pruebas
+hypothesis==6.92.1
+pytest==7.4.3
