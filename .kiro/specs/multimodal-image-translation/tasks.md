@@ -60,31 +60,31 @@ Implementación incremental del pipeline de traducción de imágenes en seis fas
     - Reutilizar modelo de caché si ya fue cargado; cargarlo si no
     - _Requisitos: 4.1, 4.3, 4.4, 4.5, 4.6, 4.7_
 
-- [ ] 5. Checkpoint – Validar Módulo de Traducción
+- [x] 5. Checkpoint – Validar Módulo de Traducción
   - Asegurarse de que todos los tests de `tests/test_translation_module.py` pasan con `pytest tests/test_translation_module.py`. Consultar al usuario si surgen dudas.
 
-- [ ] 6. Fase 4 – Orquestador (`src/orchestrator.py`)
-  - [ ] 6.1 Implementar los dataclasses `RegionTexto` y `ResultadoTraduccion` en `src/orchestrator.py` (o importarlos desde `src/ocr_module.py`)
+- [x] 6. Fase 4 – Orquestador (`src/orchestrator.py`)
+  - [x] 6.1 Implementar los dataclasses `RegionTexto` y `ResultadoTraduccion` en `src/orchestrator.py` (o importarlos desde `src/ocr_module.py`)
     - Definir `ResultadoTraduccion` con campos: `texto_original`, `idioma_origen`, `texto_traducido`, `idioma_destino`, `regiones`, `error`, `tiempos_ms`
     - _Requisitos: 6.1, 6.3_
 
-  - [ ] 6.2 Implementar `TraductorDeImagenes.__init__()`, `cargar_imagen()` y `detectar_texto()`
+  - [x] 6.2 Implementar `TraductorDeImagenes.__init__()`, `cargar_imagen()` y `detectar_texto()`
     - En `__init__()`: inicializar `ModuloOCR`, `ModuloTraduccion`, `target_language`, `confidence_threshold=0.3`, `use_gpu`; detectar GPU con `torch.cuda.is_available()`
     - En `cargar_imagen()`: leer la imagen con OpenCV/Pillow, retornar `np.ndarray`; registrar estado interno de imagen cargada
     - En `detectar_texto()`: verificar que `cargar_imagen` fue invocado; invocar `ModuloOCR.detectar_regiones()` y `consolidar_texto()`; retornar lista de dicts con campos `bbox`, `texto`, `confianza`
     - _Requisitos: 6.2, 6.5, 9.1, 7.6_
 
-  - [ ] 6.3 Implementar `TraductorDeImagenes.traducir()` y `procesar()`
+  - [x] 6.3 Implementar `TraductorDeImagenes.traducir()` y `procesar()`
     - En `traducir()`: verificar estado de imagen cargada; invocar `utils.detectar_idioma()` sobre el texto; invocar `ModuloTraduccion.traducir()`; retornar texto traducido
     - En `procesar()`: ejecutar el pipeline completo en orden (`cargar_imagen` → `detectar_texto` → `traducir` → construcción de `ResultadoTraduccion`); registrar tiempo en ms de cada etapa con `utils.milisegundos_actuales()`; capturar cualquier excepción, registrar en log (etapa + tipo + mensaje) y retornar `ResultadoTraduccion` con campo `error` poblado
     - Manejar el caso de lista vacía de regiones retornando `ResultadoTraduccion` con `error = "No se detectó texto en la imagen"`
     - _Requisitos: 6.1, 6.2, 6.3, 6.4, 6.5, 2.5_
 
-- [ ] 7. Checkpoint – Validar Orquestador
+- [x] 7. Checkpoint – Validar Orquestador
   - Asegurarse de que todos los tests de `tests/test_orchestrator.py` pasan con `pytest tests/test_orchestrator.py`. Consultar al usuario si surgen dudas.
 
-- [ ] 8. Fase 4b – Utilidades (`src/utils.py`)
-  - [ ] 8.1 Implementar `dibujar_bboxes()`, `detectar_idioma()`, `configurar_logging()` y `milisegundos_actuales()` en `src/utils.py`
+- [x] 8. Fase 4b – Utilidades (`src/utils.py`)
+  - [x] 8.1 Implementar `dibujar_bboxes()`, `detectar_idioma()`, `configurar_logging()` y `milisegundos_actuales()` en `src/utils.py`
     - `dibujar_bboxes()`: recibir `np.ndarray` y lista de `RegionTexto`; dibujar rectángulos con OpenCV sobre una copia de la imagen; retornar la copia anotada
     - `detectar_idioma()`: invocar `langdetect.detect()`; retornar código ISO 639-1
     - `configurar_logging()`: configurar el logger con formato `[TIMESTAMP] [NIVEL] [ETAPA] mensaje`; retornar instancia de `logging.Logger`
