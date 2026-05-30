@@ -126,11 +126,22 @@ class ModuloTraduccion:
             traductor = self._model_cache[clave]
         else:
             traductor = self._cargar_modelo(idioma_origen, idioma_destino)
+            self._model_cache[clave] = traductor
 
         # 6. Ejecutar la traducción
-        modelo_nombre = getattr(traductor, "model", None)
         # Detect if this is an mbart pipeline by checking the model config
-        es_mbart = _MBART_MODEL in (traductor.model.config._name_or_path or "")
+        es_mbart = False
+        try:
+            # Try to get the model name from the pipeline
+            model_obj = getattr(traductor, "model", None)
+            if model_obj is not None:
+                config_obj = getattr(model_obj, "config", None)
+                if config_obj is not None:
+                    model_name = getattr(config_obj, "_name_or_path", "")
+                    es_mbart = _MBART_MODEL in (model_name or "")
+        except AttributeError:
+            # If we can't access the model config, assume it's not mbart
+            es_mbart = False
 
         if es_mbart:
             mbart_tgt = _ISO_TO_MBART[idioma_destino]
@@ -139,6 +150,7 @@ class ModuloTraduccion:
         else:
             resultado = traductor(texto)
 
+        # resultado should be a list from the pipeline
         return resultado[0]["translation_text"]
 
     # ------------------------------------------------------------------
