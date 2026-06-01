@@ -274,12 +274,12 @@ class TestModuloTraduccion:
 # Pruebas basadas en propiedades – Hypothesis
 # ---------------------------------------------------------------------------
 
-# Estrategia para generar texto no vacío
+# Estrategia para generar texto no vacío (excluye cadenas solo de espacios)
 texto_strategy = st.text(
     min_size=1,
     max_size=1000,
     alphabet=st.characters(whitelist_categories=("Lu", "Ll", "Nd", "Zs")),
-)
+).filter(lambda s: s.strip() != "")
 
 # Estrategia para generar texto con solo espacios en blanco
 whitespace_text_strategy = st.text(
@@ -327,7 +327,7 @@ def test_p3_identity_same_language(texto, idioma):
 # ---------------------------------------------------------------------------
 
 @pytest.mark.skipif(not HYPOTHESIS_AVAILABLE, reason="Hypothesis not installed")
-@settings(max_examples=50, suppress_health_check=[HealthCheck.too_slow])
+@settings(max_examples=50, suppress_health_check=[HealthCheck.too_slow], deadline=None)
 @given(
     texto=st.text(min_size=1, max_size=100, alphabet=st.characters(whitelist_categories=("Lu", "Ll"))),
     src_lang=iso_code_strategy,

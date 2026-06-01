@@ -91,14 +91,14 @@ Implementación incremental del pipeline de traducción de imágenes en seis fas
     - `milisegundos_actuales()`: retornar `int(time.time() * 1000)`
     - _Requisitos: 5.4, 6.4_
 
-- [ ] 9. Fase 5 – Interfaz Gradio (`app.py`)
-  - [ ] 9.1 Implementar `validar_imagen()` en `app.py`
+- [x] 9. Fase 5 – Interfaz Gradio (`app.py`)
+  - [x] 9.1 Implementar `validar_imagen()` en `app.py`
     - Verificar tipo MIME del archivo (no solo extensión) para JPEG, PNG y BMP
     - Verificar que el tamaño no supera 10 MB
     - Retornar `(True, "")` si es válida o `(False, mensaje_error)` con el mensaje exacto definido en los requisitos
     - _Requisitos: 1.1, 1.3, 1.4_
 
-  - [ ] 9.2 Implementar `procesar_imagen()` como callback principal de Gradio en `app.py`
+  - [x] 9.2 Implementar `procesar_imagen()` como callback principal de Gradio en `app.py`
     - Recibir `imagen: np.ndarray` e `idioma_destino: str`
     - Validar que se ha seleccionado un idioma destino; mostrar mensaje si no
     - Instanciar `TraductorDeImagenes` e invocar `procesar()`
@@ -106,7 +106,7 @@ Implementación incremental del pipeline de traducción de imágenes en seis fas
     - Retornar la tupla `(imagen_anotada, texto_original, idioma_origen, texto_traducido, mensaje_error)`
     - _Requisitos: 1.2, 1.6, 5.1, 5.2, 5.3, 5.6_
 
-  - [ ] 9.3 Implementar `construir_interfaz()` con `gradio.Blocks` en `app.py`
+  - [x] 9.3 Implementar `construir_interfaz()` con `gradio.Blocks` en `app.py`
     - Añadir componente de carga de imagen (`gr.Image`)
     - Añadir selector de `Idioma_Destino` con los 9 idiomas soportados, disponible antes de cargar la imagen
     - Añadir indicador de progreso visible durante el procesamiento
@@ -114,35 +114,35 @@ Implementación incremental del pipeline de traducción de imágenes en seis fas
     - Conectar el botón de envío al callback `procesar_imagen()`
     - _Requisitos: 1.5, 5.1, 5.2, 5.3, 5.4, 5.5_
 
-  - [ ] 9.4 Añadir el bloque `if __name__ == "__main__"` en `app.py` para lanzar la interfaz
+  - [x] 9.4 Añadir el bloque `if __name__ == "__main__"` en `app.py` para lanzar la interfaz
     - Llamar a `construir_interfaz().launch()` con los parámetros adecuados para entorno local y Colab
     - _Requisitos: 7.4, 11.5_
 
-- [ ] 10. Checkpoint – Validar Interfaz Gradio
+- [x] 10. Checkpoint – Validar Interfaz Gradio
   - Asegurarse de que `app.py` arranca sin excepciones no controladas ejecutando `python app.py` (o la celda equivalente en Colab). Consultar al usuario si surgen dudas.
 
-- [ ] 11. Fase 6 – Pruebas de integración y ajuste final
-  - [ ] 11.1 Escribir prueba de integración end-to-end: imagen en inglés → español
+- [x] 11. Fase 6 – Pruebas de integración y ajuste final
+  - [x] 11.1 Escribir prueba de integración end-to-end: imagen en inglés → español
     - Procesar una imagen de prueba real con texto en inglés usando `TraductorDeImagenes.procesar()`
     - Verificar que el resultado contiene texto original no vacío, idioma origen detectado como `"en"` y texto traducido no vacío
     - Verificar que el tiempo total de procesamiento es inferior a 60 segundos en entorno sin GPU
     - Archivo: `tests/test_orchestrator.py`
     - _Requisitos: 11.1_
 
-  - [ ] 11.2 Escribir prueba de integración end-to-end: imagen en japonés/chino → español
+  - [x] 11.2 Escribir prueba de integración end-to-end: imagen en japonés/chino → español
     - Procesar una imagen de prueba real con texto en japonés o chino usando `TraductorDeImagenes.procesar()`
     - Verificar que el resultado contiene texto original no vacío y texto traducido no vacío
     - Verificar que el tiempo total de procesamiento es inferior a 120 segundos en entorno sin GPU
     - Archivo: `tests/test_orchestrator.py`
     - _Requisitos: 11.2_
 
-  - [ ] 11.3 Escribir prueba de integración: imagen sin texto detectable
+  - [x] 11.3 Escribir prueba de integración: imagen sin texto detectable
     - Procesar una imagen sin texto usando `TraductorDeImagenes.procesar()`
     - Verificar que `ResultadoTraduccion.error == "No se detectó texto en la imagen"`
     - Archivo: `tests/test_orchestrator.py`
     - _Requisitos: 2.5, 11.6_
 
-- [ ] 12. Checkpoint final – Validar el sistema completo
+- [x] 12. Checkpoint final – Validar el sistema completo
   - Ejecutar `pytest tests/` y confirmar que al menos el 80% de los casos pasan. Verificar que `python app.py` arranca sin errores. Consultar al usuario si surgen dudas.
 
 ---
