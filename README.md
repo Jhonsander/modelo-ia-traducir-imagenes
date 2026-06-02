@@ -16,6 +16,7 @@ Aplicación Python que detecta texto en imágenes mediante OCR, identifica autom
 ## Características principales
 
 - **OCR multilingüe** — detecta texto en inglés, español, francés, alemán, portugués, italiano, chino simplificado, japonés y coreano
+- **Gradio** — biblioteca de Python que permite crear interfaces web interactivas para modelos de machine learning y aplicaciones de ciencia de datos de manera sencilla y accesible.
 - **Traducción automática** — usa modelos locales de Hugging Face sin llamadas a APIs externas de pago
 - **Detección de idioma origen** — identifica automáticamente el idioma del texto extraído
 - **Visualización de resultados** — muestra la imagen original con rectángulos sobre cada región de texto detectada
