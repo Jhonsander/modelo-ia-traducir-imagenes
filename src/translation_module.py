@@ -47,6 +47,19 @@ _ISO_SOPORTADOS = {info["iso"] for info in IDIOMAS_SOPORTADOS.values()}
 # Fallback multilingual model
 _MBART_MODEL = "facebook/mbart-large-50-many-to-many-mmt"
 
+# Pares que usan inglés como idioma pivot (src→en→tgt) porque no existe un
+# modelo opus-mt directo de calidad suficiente y mBART produce resultados
+# incorrectos para ese par (p.ej. zh→es produce inglés en mBART).
+# Formato: (idioma_origen, idioma_destino)
+_USAR_PIVOT_EN: set = {
+    ("zh", "es"), ("zh", "fr"), ("zh", "de"), ("zh", "pt"),
+    ("zh", "it"), ("zh", "ja"), ("zh", "ko"),
+    ("ja", "fr"), ("ja", "de"), ("ja", "pt"), ("ja", "it"),
+    ("ja", "ko"), ("ja", "zh"),
+    ("ko", "fr"), ("ko", "de"), ("ko", "pt"), ("ko", "it"),
+    ("ko", "ja"), ("ko", "zh"),
+}
+
 
 # ---------------------------------------------------------------------------
 # Translation pipeline factory
@@ -87,20 +100,37 @@ class _TranslationPipeline:
 
         Args:
             texto: Texto a traducir.
-            **kwargs: Argumentos adicionales (p. ej. forced_bos_token_id para mBART).
+            **kwargs: Para mBART se esperan ``src_lang`` y ``tgt_lang`` (códigos
+                      mBART como "en_XX", "ja_XX", etc.).
 
         Returns:
             Lista con un dict ``{"translation_text": texto_traducido}``.
         """
         if self._model_name == _MBART_MODEL:
-            inputs = self.tokenizer(texto, return_tensors="pt", padding=True).to(self._torch_device)
-            forced_bos_token_id = kwargs.get("forced_bos_token_id")
-            if forced_bos_token_id is not None:
-                translated = self.model.generate(**inputs, forced_bos_token_id=forced_bos_token_id)
+            src_lang = kwargs.get("src_lang")
+            tgt_lang = kwargs.get("tgt_lang")
+
+            # src_lang DEBE configurarse antes de tokenizar, de lo contrario
+            # el tokenizer asume inglés y la traducción sale en inglés.
+            if src_lang:
+                self.tokenizer.src_lang = src_lang
+
+            inputs = self.tokenizer(
+                texto, return_tensors="pt", padding=True
+            ).to(self._torch_device)
+
+            # forced_bos_token_id indica el idioma destino al decoder de mBART.
+            if tgt_lang:
+                forced_bos_token_id = self.tokenizer.lang_code_to_id[tgt_lang]
+                translated = self.model.generate(
+                    **inputs, forced_bos_token_id=forced_bos_token_id
+                )
             else:
                 translated = self.model.generate(**inputs)
         else:
-            inputs = self.tokenizer([texto], return_tensors="pt", padding=True).to(self._torch_device)
+            inputs = self.tokenizer(
+                [texto], return_tensors="pt", padding=True
+            ).to(self._torch_device)
             translated = self.model.generate(**inputs)
 
         texto_traducido = self.tokenizer.decode(translated[0], skip_special_tokens=True)
@@ -198,7 +228,33 @@ class ModuloTraduccion:
                 f"Par de idiomas no soportado: {idioma_origen} → {idioma_destino}"
             )
 
-        # 5. Obtener o cargar el modelo (pipeline)
+        # 5. Para pares sin modelo directo de calidad, usar inglés como pivot
+        if (idioma_origen, idioma_destino) in _USAR_PIVOT_EN:
+            logger.info(
+                "Usando pivot en para %s→%s: %s→en→%s",
+                idioma_origen, idioma_destino, idioma_origen, idioma_destino,
+            )
+            # Paso 1: idioma_origen → inglés
+            texto_en = self._traducir_par(texto, idioma_origen, "en")
+            # Paso 2: inglés → idioma_destino (solo si el destino no es inglés)
+            if idioma_destino == "en":
+                return texto_en
+            return self._traducir_par(texto_en, "en", idioma_destino)
+
+        return self._traducir_par(texto, idioma_origen, idioma_destino)
+
+    def _traducir_par(self, texto: str, idioma_origen: str, idioma_destino: str) -> str:
+        """Traduce un texto usando el modelo para el par dado (sin pivot).
+
+        Args:
+            texto: Texto a traducir.
+            idioma_origen: Código ISO 639-1 del idioma origen.
+            idioma_destino: Código ISO 639-1 del idioma destino.
+
+        Returns:
+            Texto traducido.
+        """
+        # Obtener o cargar el modelo (pipeline)
         clave = (idioma_origen, idioma_destino)
         if clave not in self._model_cache:
             pipe = self._cargar_modelo(idioma_origen, idioma_destino)
@@ -207,23 +263,10 @@ class ModuloTraduccion:
         pipe = self._model_cache[clave]
 
         # 6. Ejecutar la traducción
-        # Detect if this is an mbart pipeline by checking the model name
-        model_name = ""
-        try:
-            model_name = pipe.model.config._name_or_path
-        except Exception:
-            pass
-
-        if _MBART_MODEL in model_name:
-            # mbart pipeline: set src_lang and forced_bos_token_id
-            try:
-                pipe.tokenizer.src_lang = _ISO_TO_MBART[idioma_origen]
-                forced_bos_token_id = pipe.tokenizer.lang_code_to_id[
-                    _ISO_TO_MBART[idioma_destino]
-                ]
-                result = pipe(texto, forced_bos_token_id=forced_bos_token_id)
-            except Exception:
-                result = pipe(texto)
+        if _MBART_MODEL in pipe._model_name:
+            mbart_src = _ISO_TO_MBART.get(idioma_origen, "en_XX")
+            mbart_tgt = _ISO_TO_MBART.get(idioma_destino, "es_XX")
+            result = pipe(texto, src_lang=mbart_src, tgt_lang=mbart_tgt)
         else:
             result = pipe(texto)
 

@@ -12,8 +12,13 @@ Responsabilidades:
 
 from __future__ import annotations
 
+import os
 import logging
 from typing import Optional, Tuple
+
+# Necesario para compatibilidad con protobuf >= 4.x y el tokenizer de mBART.
+# Sin esto, sentencepiece lanza "Descriptors cannot be created directly."
+os.environ.setdefault("PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION", "python")
 
 import gradio as gr
 import numpy as np
@@ -113,6 +118,16 @@ def procesar_imagen(
     import os
     import cv2
     from src.ocr_module import RegionTexto
+
+    # Validar que se ha proporcionado una imagen
+    if imagen is None:
+        return (
+            None,
+            "",
+            "",
+            "",
+            "Por favor, carga una imagen antes de traducir.",
+        )
 
     # Req 1.6: Validar que se ha seleccionado un idioma destino
     if not idioma_destino:
