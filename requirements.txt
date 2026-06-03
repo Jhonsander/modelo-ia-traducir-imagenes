@@ -1,33 +1,66 @@
 # Dependencias del Sistema de Traducción Multimodal de Imágenes
-# Versiones fijadas con == para reproducibilidad (Python 3.8+)
-# Requisitos: 7.4, 7.5
+# Versiones exactas del entorno de desarrollo validado (Python 3.10)
+# Instalación: pip install -r requirements.txt
 
-# Deep learning
-torch==2.0.1
-torchvision==0.15.2
+# ── Deep learning ─────────────────────────────────────────────────────────────
+torch==2.12.0
+torchvision==0.27.0
 
-# OCR
-easyocr==1.7.1
+# ── OCR ───────────────────────────────────────────────────────────────────────
+easyocr==1.7.2
+python-bidi==0.6.10       # Soporte de texto bidireccional (árabe, hebreo)
+pyclipper==1.4.0          # Requerido por el detector de texto de EasyOCR
+shapely==2.1.2            # Geometría de polígonos para bboxes
 
-# Traducción (Hugging Face)
-transformers==4.35.2
-sentencepiece==0.1.99
-sacremoses==0.1.1
-huggingface-hub==0.19.4
+# ── Traducción (Hugging Face) ──────────────────────────────────────────────────
+transformers==5.9.0
+tokenizers==0.22.2
+sentencepiece==0.1.99     # Tokenizer para mBART y otros modelos multilinguees
+sacremoses==0.1.1         # Tokenizer para modelos Marian MT (Helsinki-NLP)
+safetensors==0.7.0        # Carga de pesos en formato seguro
+huggingface_hub==1.17.0   # Descarga y gestion de modelos del Hub
+tiktoken==0.13.0          # Tokenizer alternativo (fallback cuando falla sentencepiece)
 
-# Interfaz web
-gradio==3.50.2
+# ── Interfaz web ──────────────────────────────────────────────────────────────
+gradio==6.15.2
+gradio_client==2.5.0
 
-# Detección de idioma
+# ── Detección de idioma ───────────────────────────────────────────────────────
 langdetect==1.0.9
 
-# Visión por computador
-opencv-python==4.8.1.78
+# ── Visión por computador ─────────────────────────────────────────────────────
+opencv-python==4.13.0.92
 Pillow==10.1.0
+scikit-image==0.25.2      # Procesamiento de imágenes auxiliar
+imageio==2.37.3
 
-# Utilidades numéricas
-numpy==1.24.4
+# ── Serialización / compatibilidad ───────────────────────────────────────────
+protobuf==3.20.3          # IMPORTANTE: no subir a 4.x+, rompe el tokenizer de mBART
+                          # Si pip instala una version superior, ejecutar:
+                          # pip install "protobuf==3.20.3" --force-reinstall
 
-# Pruebas
-hypothesis==6.92.1
-pytest==7.4.3
+# ── Utilidades numéricas ──────────────────────────────────────────────────────
+numpy==2.2.6
+scipy==1.15.3
+
+# ── Servidor web (usado por Gradio internamente) ──────────────────────────────
+fastapi==0.136.3
+uvicorn==0.48.0
+starlette==1.2.1
+python-multipart==0.0.30
+httpx==0.28.1
+
+# ── Utilidades generales ──────────────────────────────────────────────────────
+requests==2.34.2
+tqdm==4.67.3
+filelock==3.29.0
+packaging==26.2
+PyYAML==6.0.3
+regex==2026.5.9
+sympy==1.14.0
+typing_extensions==4.15.0
+
+# ── Pruebas ───────────────────────────────────────────────────────────────────
+hypothesis==6.131.15
+pytest==9.0.3
+pytest-timeout==2.4.0
